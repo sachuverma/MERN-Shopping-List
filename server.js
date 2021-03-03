@@ -1,22 +1,23 @@
 const express = require("express"),
   mongoose = require("mongoose"),
-  bodyParser = require("body-parser"),
   cors = require("cors"),
   path = require("path"),
-  app = express();
+  config = require("config");
+app = express();
 
-const items = require("./routes/api/items");
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-const db = require("./config/keys").mongoURI;
+const db = config.get("mongoURI");
 
 mongoose
   .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("DB Connected!"))
   .catch((err) => console.log(`DB Error: `, err));
 
-app.use("/api/items", items);
+app.use("/api/items", require("./routes/api/items"));
+app.use("/api/users", require("./routes/api/users"));
+app.use("/api/auth", require("./routes/api/auth"));
 
 // SERVE STATIC ASSETS IF IN PRODUCTION
 if (process.env.NODE_ENV === "production") {
